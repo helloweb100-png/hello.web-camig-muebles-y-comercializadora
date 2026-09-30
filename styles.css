@@ -529,7 +529,7 @@ textarea, input, select { font-family:var(--font); }
     left: 0;
     right: 0;
     bottom: -70vh;
-    background: url('img/web/hero-sala-esquinera-gris.jpg') center 40% / cover no-repeat;
+    background: url('img/hero.jpg') center 40% / cover no-repeat;
     will-change: transform;
     z-index: 0;
 }
