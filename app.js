@@ -333,6 +333,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* ═══════════════════════════════════════════
+       11. GALERÍA — VISOR (lightbox)
+    ═══════════════════════════════════════════ */
+    const lightbox = document.getElementById('lightbox');
+    const galItems = Array.from(document.querySelectorAll('.gal-item'));
+    if (lightbox && galItems.length) {
+        const lbImg   = lightbox.querySelector('.lb-img');
+        const lbText  = lightbox.querySelector('.lb-text');
+        const lbCount = lightbox.querySelector('.lb-count');
+        const lbClose = lightbox.querySelector('.lb-close');
+        let current = 0;
+        let opener = null;
+
+        const show = (i) => {
+            current = (i + galItems.length) % galItems.length;
+            const img = galItems[current].querySelector('img');
+            lbImg.src = img.currentSrc || img.src;
+            lbImg.alt = img.alt;
+            lbText.textContent = img.alt;
+            lbCount.textContent = `${current + 1} / ${galItems.length}`;
+        };
+        const open = (i) => {
+            opener = document.activeElement;
+            show(i);
+            lightbox.classList.add('open');
+            lightbox.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            lbClose.focus();
+        };
+        const close = () => {
+            lightbox.classList.remove('open');
+            lightbox.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (opener) opener.focus();
+        };
+
+        galItems.forEach((btn, i) => btn.addEventListener('click', () => open(i)));
+        lbClose.addEventListener('click', close);
+        lightbox.querySelector('.lb-prev').addEventListener('click', () => show(current - 1));
+        lightbox.querySelector('.lb-next').addEventListener('click', () => show(current + 1));
+        lightbox.addEventListener('click', e => {
+            if (e.target === lightbox || e.target.classList.contains('lb-figure')) close();
+        });
+        document.addEventListener('keydown', e => {
+            if (!lightbox.classList.contains('open')) return;
+            if (e.key === 'Escape') close();
+            else if (e.key === 'ArrowLeft') show(current - 1);
+            else if (e.key === 'ArrowRight') show(current + 1);
+        });
+
+        // Deslizar en celular
+        let touchX = null;
+        lightbox.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+        lightbox.addEventListener('touchend', e => {
+            if (touchX === null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            touchX = null;
+            if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+        }, { passive: true });
+    }
+
 });
 
 /* ═══════════════════════════════════════════
